@@ -1,0 +1,24 @@
+apiVersion: "kafka.strimzi.io/v1beta2"
+kind: "KafkaConnector"
+metadata:
+  # connector name
+  name: "sink-mongodb-output-faust-enriched-rides-json-1899c988"
+  labels:
+    # kafka connect [cluster] name
+    strimzi.io/cluster: edh
+spec:
+  class: com.mongodb.kafka.connect.MongoSinkConnector
+  tasksMax: 1
+  config:
+    key.converter: org.apache.kafka.connect.json.JsonConverter
+    value.converter: org.apache.kafka.connect.json.JsonConverter
+    key.converter.schemas.enable: "false"
+    value.converter.schemas.enable: "false"
+    connection.uri: "mongodb://root:w2nyCRBZKj@20.75.33.14:27017"
+    max.num.retries: 2
+    topics: "output-faust-enriched-rides"
+    database: "owshq"
+    collection: "output-faust-enriched-rides"
+    document.id.strategy: "com.mongodb.kafka.connect.sink.processor.id.strategy.BsonOidStrategy"
+    post.processor.chain: "com.mongodb.kafka.connect.sink.processor.DocumentIdAdder"
+    retries.defer.timeout: 6000

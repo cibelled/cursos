@@ -1,0 +1,28 @@
+apiVersion: "kafka.strimzi.io/v1beta2"
+kind: "KafkaConnector"
+metadata:
+  # connector name
+  name: "sink-yugabytedb-ysql-enriched-ksqldb-stream-pr-musics-analysis-avro-7661b667"
+  labels:
+    # kafka connect [cluster] name
+    strimzi.io/cluster: edh
+spec:
+  class: io.confluent.connect.jdbc.JdbcSinkConnector
+  tasksMax: 1
+  config:
+    key.converter: "org.apache.kafka.connect.converters.IntegerConverter"
+    value.converter: "io.confluent.connect.avro.AvroConverter"
+    value.converter.schema.registry.url: "http://schema-registry-cp-schema-registry:8081"
+    key.converter.schemas.enable: "false"
+    value.converter.schemas.enable: "true"
+    connection.url: "jdbc:postgresql://yb-tservers.database.svc.cluster.local:5433/owshq?user=yugabyte&password=yugabyte"
+    connection.attempts: "2"
+    topics: "enriched-ksqldb-stream-pr-musics-analysis-avro"
+    table.name.format: "ksqldb_enriched_pr_musics_analysis"
+    auto.create: "true"
+    auto.evolve: "true"
+    insert.mode: "upsert"
+    pk.mode: "record_key"
+    pk.fields: "USERS_USER_ID"
+    batch.size: "1500"
+    delete.enabled: True

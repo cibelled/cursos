@@ -1,0 +1,27 @@
+apiVersion: "kafka.strimzi.io/v1beta2"
+kind: "KafkaConnector"
+metadata:
+  # connector name
+  name: "sink-bq-enriched-ksqldb-stream-pr-musics-analysis-avro-74fc8bde"
+  labels:
+    # kafka connect [cluster] name
+    strimzi.io/cluster: edh
+spec:
+  class: com.wepay.kafka.connect.bigquery.BigQuerySinkConnector
+  tasksMax: 1
+  config:
+    key.converter: "org.apache.kafka.connect.storage.StringConverter"
+    value.converter: "io.confluent.connect.avro.AvroConverter"
+    value.converter.schema.registry.url: "http://schema-registry-cp-schema-registry:8081"
+    key.converter.schemas.enable: "false"
+    topics : "enriched-ksqldb-stream-pr-musics-analysis-avro"
+    autoCreateTables : "true"
+    autoUpdateSchemas : "true"
+    schemaRetriever : "com.wepay.kafka.connect.bigquery.retrieve.IdentitySchemaRetriever"
+    project : "silver-charmer-243611"
+    defaultDataset : "OwsHQ"
+    keySource: "FILE"
+    keyfile : "/opt/kafka/external-configuration/connector-config-bq/bq-credentials.json"
+    allowNewBigQueryFields: true
+    allowSchemaUnionization: true
+    allowBigQueryRequiredFieldRelaxation: true
