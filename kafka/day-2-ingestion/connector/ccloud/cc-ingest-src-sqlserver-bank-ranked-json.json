@@ -1,0 +1,19 @@
+{
+  "name": "cc-ingest-src-sqlserver-bank-ranked-json-c022a058",
+  "config": {
+    "connector.class": "MicrosoftSqlServerSource",
+    "name": "cc-ingest-src-sqlserver-bank-ranked-json-c022a058",
+    "topic.prefix": "cc-src-sqlserver-",
+    "connection.host": "20.75.27.11",
+    "connection.port": "1433",
+    "connection.user": "sa",
+    "db.name": "owshq",
+    "ssl.mode": "prefer",
+    "table.whitelist": "vw_bank_ranked",
+    "timestamp.column.name": "create_at",
+    "incrementing.column.name": "ranking_id",
+    "table.types": "VIEW",
+    "output.data.format": "JSON",
+    "tasks.max": "1"
+  }
+}

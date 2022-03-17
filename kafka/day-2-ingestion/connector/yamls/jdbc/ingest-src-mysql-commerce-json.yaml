@@ -1,0 +1,36 @@
+apiVersion: "kafka.strimzi.io/v1beta2"
+kind: "KafkaConnector"
+metadata:
+  # connector name
+  name: "ingest-src-mysql-commerce-json-8ba7e21a"
+  labels:
+    # kafka connect [cluster] name
+    strimzi.io/cluster: edh
+spec:
+  class: io.confluent.connect.jdbc.JdbcSourceConnector
+  tasksMax: 2
+  config:
+    key.converter: org.apache.kafka.connect.json.JsonConverter
+    value.converter: org.apache.kafka.connect.json.JsonConverter
+    key.converter.schemas.enable: true
+    value.converter.schemas.enable: true
+    connection.url: "jdbc:mysql://20.72.108.171:3306"
+    connection.database: "owshq"
+    connection.user: "${file:/opt/kafka/external-configuration/connector-config-mysql/mysql-credentials.properties:mysql_username}"
+    connection.password: "${file:/opt/kafka/external-configuration/connector-config-mysql/mysql-credentials.properties:mysql_password}"
+    connection.attempts: "2"
+    query: "SELECT * FROM owshq.commerce"
+    mode: "incrementing"
+    topic.prefix: "src-mysql-commerce-json"
+    incrementing.column.name: "incr"
+    validate.non.null: "false"
+    transforms: "createKey,extractInt,InsertTopic,InsertSourceDetails"
+    transforms.createKey.type: "org.apache.kafka.connect.transforms.ValueToKey"
+    transforms.createKey.fields: "incr"
+    transforms.extractInt.type: "org.apache.kafka.connect.transforms.ExtractField$Key"
+    transforms.extractInt.field: "incr"
+    transforms.InsertTopic.type: "org.apache.kafka.connect.transforms.InsertField$Value"
+    transforms.InsertTopic.topic.field: "messagetopic"
+    transforms.InsertSourceDetails.type: "org.apache.kafka.connect.transforms.InsertField$Value"
+    transforms.InsertSourceDetails.static.field: "messagesource"
+    transforms.InsertSourceDetails.static.value: "mysql"

@@ -1,0 +1,22 @@
+apiVersion: "kafka.strimzi.io/v1beta2"
+kind: "KafkaConnector"
+metadata:
+  # connector name
+  name: "ingest-src-mongodb-restaurant-json-a04181dd"
+  labels:
+    # kafka connect [cluster] name
+    strimzi.io/cluster: edh
+spec:
+  class: com.mongodb.kafka.connect.MongoSourceConnector
+  tasksMax: 1
+  config:
+    key.converter: org.apache.kafka.connect.json.JsonConverter
+    value.converter: org.apache.kafka.connect.json.JsonConverter
+    key.converter.schemas.enable: true
+    value.converter.schemas.enable: true
+    connection.uri: "mongodb://root:w2nyCRBZKj@20.75.33.14:27017"
+    topic.prefix: "src.mongodb"
+    database: "owshq"
+    collection: "restaurant"
+    copy.existing: true
+    publish.full.document.only: true

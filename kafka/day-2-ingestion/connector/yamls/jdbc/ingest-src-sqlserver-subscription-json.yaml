@@ -1,0 +1,35 @@
+apiVersion: "kafka.strimzi.io/v1beta2"
+kind: "KafkaConnector"
+metadata:
+  # connector name
+  name: "ingest-src-sqlserver-subscription-json-d6c274f1"
+  labels:
+    # kafka connect [cluster] name
+    strimzi.io/cluster: edh
+spec:
+  class: io.confluent.connect.jdbc.JdbcSourceConnector
+  tasksMax: 2
+  config:
+    key.converter: org.apache.kafka.connect.json.JsonConverter
+    value.converter: org.apache.kafka.connect.json.JsonConverter
+    key.converter.schemas.enable: true
+    value.converter.schemas.enable: true
+    connection.url: "jdbc:sqlserver://20.75.27.11:1433;databaseName=OwsHQ"
+    connection.user: "${file:/opt/kafka/external-configuration/connector-config-mssql/mssql-credentials.properties:mssql_username}"
+    connection.password: "${file:/opt/kafka/external-configuration/connector-config-mssql/mssql-credentials.properties:mssql_password}"
+    connection.attempts: "2"
+    query: "SELECT * FROM subscription"
+    mode: "incrementing"
+    topic.prefix: "src-sqlserver-subscription-json"
+    incrementing.column.name: "incr"
+    validate.non.null: "false"
+    transforms: "createKey,extractInt,InsertTopic,InsertSourceDetails"
+    transforms.createKey.type: "org.apache.kafka.connect.transforms.ValueToKey"
+    transforms.createKey.fields: "incr"
+    transforms.extractInt.type: "org.apache.kafka.connect.transforms.ExtractField$Key"
+    transforms.extractInt.field: "incr"
+    transforms.InsertTopic.type: "org.apache.kafka.connect.transforms.InsertField$Value"
+    transforms.InsertTopic.topic.field: "messagetopic"
+    transforms.InsertSourceDetails.type: "org.apache.kafka.connect.transforms.InsertField$Value"
+    transforms.InsertSourceDetails.static.field: "messagesource"
+    transforms.InsertSourceDetails.static.value: "mssql"
